@@ -11,18 +11,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-/**
- * Adds a random fact to the page.
- */
-function addRandomFact() {
-  const facts =
-      ['I participate in collegiate a cappella.', 'I started dancing last summer.', 'I do photography and videography.', 'I have a minor in Rehabilitation Sciences.'];
-
-  // Pick a random fact.
-  const fact = facts[Math.floor(Math.random() * facts.length)];
-
-  // Add it to the page.
-  const factContainer = document.getElementById('fact-container');
-  factContainer.innerText = fact;
-}
