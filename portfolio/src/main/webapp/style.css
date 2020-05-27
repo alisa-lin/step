@@ -87,12 +87,11 @@ body {
 }
 
 h1 {
-    line-height: 40%;
     padding: none;
+    margin: none;
 }
 
 h2 {
-    line-height: 40%;
     padding-top: 15px;
 }
 
