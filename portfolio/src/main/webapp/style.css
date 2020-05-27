@@ -84,19 +84,28 @@ body {
     max-width: 650px;
     width: 650px;
     padding: 0px;
+    margin: 0px;
+}
+
+.half {
+    max-width: 320px;
+    padding: 0px;
+    display: inline;
 }
 
 h1 {
-    padding: none;
-    margin: none;
+    padding: 0px;
+    margin: 0px;
 }
 
 h2 {
-    padding-top: 15px;
+    padding: 15px 0px 0px 0px;
+    margin: 0px;
 }
 
 p {
     padding: 0px;
+    margin: 10px 0px 0px 0px;
     text-align: justify;
     text-justify: inter-word;
 }
