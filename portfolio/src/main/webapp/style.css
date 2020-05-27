@@ -1,6 +1,7 @@
 body {
     background-color: #F3F5F5;
     font-family: "Open Sans", Verdana, sans-serif;
+    line-height: 80%;
 }
 
 #content {
@@ -22,6 +23,7 @@ body {
     margin-left: auto;
     margin-right: auto;
     width: 650px;
+    padding: 10px 16px;
 }
 
 #menu-list {
