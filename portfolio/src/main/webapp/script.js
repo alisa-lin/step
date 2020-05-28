@@ -13,7 +13,7 @@
 // limitations under the License.
 
 function fetchMessage() {
-    fetch('/data').then(response => response.text()).then(message => {
+    fetch('/data').then(response => response.json()).then(message => {
         document.getElementById('text').innerHTML = message;
     });
 }
