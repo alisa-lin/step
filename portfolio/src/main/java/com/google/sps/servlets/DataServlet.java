@@ -13,7 +13,7 @@
 // limitations under the License.
 
 package com.google.sps.servlets;
-
+import com.google.sps.data.Comment;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,27 +23,34 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+/** Servlet that returns some example content. */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
   
-  private List<String>messages;
+  private ArrayList<String>comments;
 
   @Override
   public void init() {
-    messages = new ArrayList<>();
-    messages.add(
-        "A ship in port is safe, but that is not what ships are for. "
-            + "Sail out to sea and do new things. - Grace Hopper");
-    messages.add("They told me computers could only do arithmetic. - Grace Hopper");
-    messages.add("A ship in port is safe, but that's not what ships are built for. - Grace Hopper");
+    comments = new ArrayList<>();
   }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
-    String json = gson.toJson(messages);
     response.setContentType("application/json;");
-    response.getWriter().println(json);
+    if (!comments.isEmpty()) { response.getWriter().println(gson.toJson(comments.get(0))); }
+    // for (int i = 0; i < comments.size(); i++) {
+    //     response.getWriter().println(gson.toJson(comments.get(i)));
+    // }
+  }
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Gson gson = new Gson();
+    String name = request.getParameter("name");
+    String text = request.getParameter("text");
+    Comment comment = new Comment(name, text);
+    comments.add(gson.toJson(comment));
+    response.sendRedirect("/photography.html");
   }
 }
