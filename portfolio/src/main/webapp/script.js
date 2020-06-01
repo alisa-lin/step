@@ -23,7 +23,6 @@ function getComments() {
 
 /** Creates an <li> element containing text. */
 function createListElement(text) {
-    console.log(text);
   const liElement = document.createElement('li');
   liElement.innerText = text;
   return liElement;
@@ -31,6 +30,5 @@ function createListElement(text) {
 
 /** Formats a comment as name: comment given the JSON comment. */
 function formatComment(comment) {
-  var json = JSON.parse(comment);
-  return json.name + ": " + json.text;
+  return comment.name + ": " + comment.text;
 }
