@@ -53,6 +53,10 @@ body {
     float: center;
 }
 
+#comments {
+    list
+}
+
 .info-item {
     padding-left: 48px;
 }
