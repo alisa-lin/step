@@ -13,7 +13,11 @@
 // limitations under the License.
 
 package com.google.sps.servlets;
-import com.google.sps.data.Comment;
+
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+// import com.google.sps.data.Comment;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,11 +48,21 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Gson gson = new Gson();
+    // Gson gson = new Gson();
     String name = request.getParameter("name");
     String text = request.getParameter("text");
-    Comment comment = new Comment(name, text);
-    comments.add(gson.toJson(comment));
+    long timestamp = System.currentTimeMillis();
+
+    Entity commentEntity = new Entity("Comment");
+    commentEntity.setProperty("name", name);
+    commentEntity.setProperty("text", text);
+    commentEntity.setProperty("timestamp", timestamp);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(commentEntity);
+
+    // Comment comment = new Comment(name, text);
+    // comments.add(gson.toJson(comment));
     response.sendRedirect("/photography.html");
   }
 }
