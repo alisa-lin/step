@@ -113,3 +113,16 @@ p {
     text-align: justify;
     text-justify: inter-word;
 }
+
+form {
+    margin: 20px;
+}
+
+input[type=text] {
+    width: 640px;
+}
+
+textarea {
+    width: 640px;
+    height: 75px;
+}

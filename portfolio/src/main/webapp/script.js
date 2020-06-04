@@ -14,7 +14,9 @@
 
 /** Fetches existing comments and updates UI. */
 function getComments() {
-    fetch('/data').then(response => response.json()).then(comments => {
+    document.getElementById('comments').innerHTML = "";
+    var maxComments = document.getElementById("maxComments").value;
+    fetch('/data?max=' + maxComments).then(response => response.json()).then(comments => {
         comments.forEach(function(comment) {
             document.getElementById('comments').appendChild(createListElement(formatComment(comment)));
         })

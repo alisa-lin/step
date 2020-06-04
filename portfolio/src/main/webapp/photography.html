@@ -32,11 +32,20 @@
                         <input type="text" name="name">
                     </p>
                     <p>Comment:
-                        <textarea name="text" style="width:650px; height:200px;"></textarea>
+                        <textarea name="text" style="height:75px;"></textarea>
                     </p>
                     <input type="submit" />
                 </form>
-
+                <form action="/data" method="GET">
+                    Display
+                    <select onchange="getComments()" id="maxComments">
+                        <option value="3">3</option>
+                        <option value="6">6</option>
+                        <option value="9">9</option>
+                        <option value="12">12</option>
+                    </select>
+                    comments
+                </form>
                 <ul id="comments"></ul>
             </div>
         </div>
