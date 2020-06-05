@@ -16,6 +16,8 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Key;
+// import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
@@ -54,11 +56,12 @@ public class DataServlet extends HttpServlet {
       if (numComments == maxComments) {
         break;
       }
+      long id = entity.getKey().getId();
       String name = (String) entity.getProperty("name");
       String text = (String) entity.getProperty("text");
       long timestamp = (long) entity.getProperty("timestamp");
 
-      Comment comment = new Comment(name, text, timestamp);
+      Comment comment = new Comment(id, name, text, timestamp);
       comments.add(comment);
       numComments++;
     }
@@ -71,7 +74,6 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Gson gson = new Gson();
     String name = request.getParameter("name");
     String text = request.getParameter("text");
     long timestamp = System.currentTimeMillis();

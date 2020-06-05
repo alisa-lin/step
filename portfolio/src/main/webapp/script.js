@@ -18,19 +18,36 @@ function getComments() {
     var maxComments = document.getElementById("maxComments").value;
     fetch('/data?max=' + maxComments).then(response => response.json()).then(comments => {
         comments.forEach(function(comment) {
-            document.getElementById('comments').appendChild(createListElement(formatComment(comment)));
+            document.getElementById('comments').appendChild(createComment(comment));
         })
     });
 }
 
-/** Creates an <li> element containing text. */
-function createListElement(text) {
-  const liElement = document.createElement('li');
-  liElement.innerText = text;
-  return liElement;
+/** Creates a comment element. */
+function createComment(comment) {
+  const commentElement = document.createElement('li');
+  commentElement.className = 'comment';
+
+  const titleElement = document.createElement('span');
+  titleElement.innerText = comment.name + ": " + comment.text;
+
+  const deleteButtonElement = document.createElement('button');
+  deleteButtonElement.innerText = 'Delete';
+  deleteButtonElement.addEventListener('click', () => {
+    deleteComment(comment);
+
+    // Remove the comment from the DOM.
+    commentElement.remove();
+  });
+
+  commentElement.appendChild(titleElement);
+  commentElement.appendChild(deleteButtonElement);
+  return commentElement;
 }
 
-/** Formats a comment as name: comment given the JSON comment. */
-function formatComment(comment) {
-  return comment.name + ": " + comment.text;
+/** Tells the server to delete the given comment. */
+function deleteComment(comment) {
+  const params = new URLSearchParams();
+  params.append('id', comment.id);
+  fetch('/delete-data', {method: 'POST', body: params});
 }

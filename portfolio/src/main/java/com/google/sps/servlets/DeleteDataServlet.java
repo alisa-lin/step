@@ -16,15 +16,10 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.sps.data.Comment;
-import com.google.gson.Gson;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,70 +29,12 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/delete-data")
 public class DeleteDataServlet extends HttpServlet {
 
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    int maxComments = getMaxComments(request);
-    if (maxComments < 0) {
-      response.setContentType("text/html");
-      response.getWriter().println("Please enter an non-negative integer.");
-      return;
-    }
-    int numComments = 0;
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    long id = Long.parseLong(request.getParameter("id"));
 
-    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
-
+    Key commentEntityKey = KeyFactory.createKey("Comment", id);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
-
-    List<Comment> comments = new ArrayList<>();
-    for (Entity entity : results.asIterable()) {
-      if (numComments == maxComments) {
-        break;
-      }
-      String name = (String) entity.getProperty("name");
-      String text = (String) entity.getProperty("text");
-      long timestamp = (long) entity.getProperty("timestamp");
-
-      Comment comment = new Comment(name, text, timestamp);
-      comments.add(comment);
-      numComments++;
-    }
-
-    Gson gson = new Gson();
-
-    response.setContentType("application/json;");
-    response.getWriter().println(gson.toJson(comments));
-  }
-
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Gson gson = new Gson();
-    String name = request.getParameter("name");
-    String text = request.getParameter("text");
-    long timestamp = System.currentTimeMillis();
-
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("name", name);
-    commentEntity.setProperty("text", text);
-    commentEntity.setProperty("timestamp", timestamp);
-
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(commentEntity);
-
-    response.sendRedirect("/photography.html");
-  }
-
-  /** gets max comments to be displayed **/
-  private int getMaxComments(HttpServletRequest request) {
-    String maxCommentString = request.getParameter("max");
-    int maxComments;
-    try {
-      maxComments = Integer.parseInt(maxCommentString);
-    } catch (NumberFormatException e) {
-      System.err.println("Could not convert to int: " + maxCommentString);
-      return -1;
-    }
-
-    return maxComments;
+    datastore.delete(commentEntityKey);
   }
 }
