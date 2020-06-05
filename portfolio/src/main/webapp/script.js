@@ -16,7 +16,7 @@
 function getComments() {
     document.getElementById('comments').innerHTML = "";
     var maxComments = document.getElementById("maxComments").value;
-    fetch('/data?max=' + maxComments).then(response => response.json()).then(comments => {
+    fetch(`/data?max=${maxComments}`).then(response => response.json()).then(comments => {
         comments.forEach(function(comment) {
             document.getElementById('comments').appendChild(createComment(comment));
         })
