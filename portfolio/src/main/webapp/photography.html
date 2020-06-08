@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="style.css">
         <script src="script.js"></script>
     </head>
-    <body>
+    <body onload="getComments()">
         <div class="menu" >
             <ul id="menu-list">
                 <li><a href="index.html" class="menu-link">Home</a></li>
@@ -25,6 +25,28 @@
             <div id="gallery">
                 <img src="images/photo1.JPG" class="half">
                 <img src="images/photo2.JPG" class="half">
+            </div>
+            <div id="comment-section">
+                <form class="comments-form" action="/data" method="POST">
+                    <p>Name:
+                        <input type="text" name="name">
+                    </p>
+                    <p>Comment:
+                        <textarea name="text" style="height:75px;"></textarea>
+                    </p>
+                    <input type="submit" />
+                </form>
+                <form action="/data" method="GET">
+                    Display
+                    <select onchange="getComments()" id="maxComments">
+                        <option value="3">3</option>
+                        <option value="6">6</option>
+                        <option value="9">9</option>
+                        <option value="12">12</option>
+                    </select>
+                    comments
+                </form>
+                <ul id="comments"></ul>
             </div>
         </div>
     </body>

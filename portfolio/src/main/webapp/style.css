@@ -53,6 +53,10 @@ body {
     float: center;
 }
 
+#comments {
+    list
+}
+
 .info-item {
     padding-left: 48px;
 }
@@ -108,4 +112,17 @@ p {
     margin: 10px 0px 0px 0px;
     text-align: justify;
     text-justify: inter-word;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input[type=text] {
+    width: 640px;
+}
+
+textarea {
+    width: 640px;
+    height: 75px;
 }
