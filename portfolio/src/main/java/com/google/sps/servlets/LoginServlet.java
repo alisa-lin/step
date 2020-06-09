@@ -36,14 +36,14 @@ public class LoginServlet extends HttpServlet {
 
         if (userService.isUserLoggedIn()) {
             String userEmail = userService.getCurrentUser().getEmail();
-            String urlToRedirectToAfterUserLogsOut = "/login";
+            String urlToRedirectToAfterUserLogsOut = "/photography.html";
             String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
 
             loginInfo.setUserEmail(userEmail);
             loginInfo.setRedirectUrl(logoutUrl);
             loginInfo.setLoginStatus(true);
         } else {
-            String urlToRedirectToAfterUserLogsIn = "/login";
+            String urlToRedirectToAfterUserLogsIn = "/photography.html";
             String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
 
             loginInfo.setRedirectUrl(loginUrl);
