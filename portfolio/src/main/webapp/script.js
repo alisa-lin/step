@@ -12,6 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/** onload function that displays comments and comment form/login information */
+function displayCommentSection() {
+    getComments();
+    fetch('/login').then(response => response.json()).then(info => handleCommentForm(info.loggedIn, info.redirectUrl, info.userEmail));
+}
+
+/** Given the login status, this function displays the comment form or the log in button */
+function handleCommentForm(loggedIn, redirectUrl, userEmail) {
+    var login = document.getElementById('login');
+    if (!loggedIn) {
+        document.getElementById('comments-form').style.display = "none";
+        login.innerHTML = "Log in"
+        login.href = redirectUrl;
+    } else {
+        document.getElementById('comments-form').style.display = "block";
+        login.innerHTML = "Log out"
+        login.href = redirectUrl;
+    }
+}
+
 /** Fetches existing comments and updates UI. */
 function getComments() {
     document.getElementById('comments').innerHTML = "";

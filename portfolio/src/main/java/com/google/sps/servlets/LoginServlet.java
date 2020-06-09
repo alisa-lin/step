@@ -16,6 +16,8 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
+import com.google.sps.data.LoginInfo;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -25,24 +27,31 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html");
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
 
-    UserService userService = UserServiceFactory.getUserService();
-    if (userService.isUserLoggedIn()) {
-      String userEmail = userService.getCurrentUser().getEmail();
-      String urlToRedirectToAfterUserLogsOut = "/login";
-      String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
+        UserService userService = UserServiceFactory.getUserService();
+        LoginInfo loginInfo = new LoginInfo();
 
-      response.getWriter().println("<p>Hello " + userEmail + "!</p>");
-      response.getWriter().println("<p>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
-    } else {
-      String urlToRedirectToAfterUserLogsIn = "/login";
-      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+        if (userService.isUserLoggedIn()) {
+            String userEmail = userService.getCurrentUser().getEmail();
+            String urlToRedirectToAfterUserLogsOut = "/login";
+            String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
 
-      response.getWriter().println("<p>Hello stranger.</p>");
-      response.getWriter().println("<p>Login <a href=\"" + loginUrl + "\">here</a>.</p>");
+            loginInfo.setUserEmail(userEmail);
+            loginInfo.setRedirectUrl(logoutUrl);
+            loginInfo.setLoginStatus(true);
+        } else {
+            String urlToRedirectToAfterUserLogsIn = "/login";
+            String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+
+            loginInfo.setRedirectUrl(loginUrl);
+            loginInfo.setLoginStatus(false);
+        }
+
+        Gson gson = new Gson();
+
+        response.getWriter().println(gson.toJson(loginInfo));
     }
-  }
 }
