@@ -14,6 +14,11 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
@@ -29,8 +34,6 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-
         UserService userService = UserServiceFactory.getUserService();
         LoginInfo loginInfo = new LoginInfo();
 
@@ -39,9 +42,14 @@ public class LoginServlet extends HttpServlet {
             String urlToRedirectToAfterUserLogsOut = "/photography.html";
             String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
 
+            // If user has not set a nickname, redirect to nickname page
+            String nickname = getUserNickname(userService.getCurrentUser().getUserId());
+
+            // user is logged in and has a nickname
             loginInfo.setUserEmail(userEmail);
             loginInfo.setRedirectUrl(logoutUrl);
             loginInfo.setLoginStatus(true);
+            loginInfo.setNickname(nickname);
         } else {
             String urlToRedirectToAfterUserLogsIn = "/photography.html";
             String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
@@ -51,7 +59,22 @@ public class LoginServlet extends HttpServlet {
         }
 
         Gson gson = new Gson();
-
+        response.setContentType("application/json");
         response.getWriter().println(gson.toJson(loginInfo));
+    }
+
+    /** Returns the nickname of the user with id, or null if the user has not set a nickname. */
+    private String getUserNickname(String id) {
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        Query query =
+            new Query("UserInfo")
+                .setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+        PreparedQuery results = datastore.prepare(query);
+        Entity entity = results.asSingleEntity();
+        if (entity == null) {
+            return null;
+        }
+        String nickname = (String) entity.getProperty("nickname");
+        return nickname;
     }
 }

@@ -59,11 +59,11 @@ public class DataServlet extends HttpServlet {
       }
       long id = entity.getKey().getId();
       String email = (String) entity.getProperty("email");
-      String name = (String) entity.getProperty("name");
       String text = (String) entity.getProperty("text");
       long timestamp = (long) entity.getProperty("timestamp");
+      String nickname = (String) entity.getProperty("nickname");
 
-      Comment comment = new Comment(id, email, name, text, timestamp);
+      Comment comment = new Comment(id, email, text, nickname, timestamp);
       comments.add(comment);
       numComments++;
     }
@@ -76,19 +76,19 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // only logged-in users can comment
+    // only logged-in users with nicknames can comment
     UserService userService = UserServiceFactory.getUserService();
 
     String email = userService.getCurrentUser().getEmail();
-    String name = request.getParameter("name");
     String text = request.getParameter("text");
     long timestamp = System.currentTimeMillis();
+    String nickname = getUserNickname(userService.getCurrentUser().getUserId());
 
     Entity commentEntity = new Entity("Comment");
     commentEntity.setProperty("email", email);
-    commentEntity.setProperty("name", name);
     commentEntity.setProperty("text", text);
     commentEntity.setProperty("timestamp", timestamp);
+    commentEntity.setProperty("nickname", nickname);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
@@ -109,4 +109,20 @@ public class DataServlet extends HttpServlet {
 
     return maxComments;
   }
+
+  /** Returns the nickname of the user with id, or null if the user has not set a nickname. */
+  private String getUserNickname(String id) {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query =
+        new Query("UserInfo")
+            .setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+    PreparedQuery results = datastore.prepare(query);
+    Entity entity = results.asSingleEntity();
+    if (entity == null) {
+      return null;
+    }
+    String nickname = (String) entity.getProperty("nickname");
+    return nickname;
+  }
 }
+

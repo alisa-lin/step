@@ -20,24 +20,9 @@ public class LoginInfo {
   private boolean loggedIn;
   private String redirectUrl;
   private String userEmail;
-  
-  public LoginInfo() {
-    this.loggedIn = false;
-    this.redirectUrl = null;
-    this.userEmail = null;
-  }
+  private String nickname;
 
-  public LoginInfo(boolean loggedIn, String redirectUrl) {
-    this.loggedIn = loggedIn;
-    this.redirectUrl = redirectUrl;
-    this.userEmail = null;
-  }
-
-  public LoginInfo(boolean loggedIn, String redirectUrl, String userEmail) {
-    this.loggedIn = loggedIn;
-    this.redirectUrl = redirectUrl;
-    this.userEmail = userEmail;
-  }
+  // using default constructor only
 
   public boolean getLoginStatus() {
     return loggedIn;
@@ -51,6 +36,10 @@ public class LoginInfo {
     return userEmail;
   }
 
+  public String getNickname() {
+    return nickname;
+  }
+
   public void setLoginStatus(boolean loggedIn) {
     this.loggedIn = loggedIn;
   }
@@ -61,5 +50,9 @@ public class LoginInfo {
 
   public void setUserEmail(String userEmail) {
     this.userEmail = userEmail;
+  }
+
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
   }
 }
