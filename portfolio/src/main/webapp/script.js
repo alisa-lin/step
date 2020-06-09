@@ -49,7 +49,7 @@ function createComment(comment) {
   commentElement.className = 'comment';
 
   const titleElement = document.createElement('span');
-  titleElement.innerText = comment.name + ": " + comment.text;
+  titleElement.innerText = comment.email + ": " + comment.text;
 
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
