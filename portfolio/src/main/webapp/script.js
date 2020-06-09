@@ -14,12 +14,12 @@
 
 /** onload function that displays comments and comment form/login information */
 function displayCommentSection() {
-    getComments();
     fetch('/login').then(response => response.json()).then(info => {
         if (info.loggedIn && !info.nickname) {
             window.location.replace("/nickname");
         }
         handleCommentForm(info.loggedIn, info.redirectUrl);
+        getComments();
     });
 }
 
