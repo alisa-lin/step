@@ -21,6 +21,8 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.sps.data.Comment;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -56,11 +58,12 @@ public class DataServlet extends HttpServlet {
         break;
       }
       long id = entity.getKey().getId();
+      String email = (String) entity.getProperty("email");
       String name = (String) entity.getProperty("name");
       String text = (String) entity.getProperty("text");
       long timestamp = (long) entity.getProperty("timestamp");
 
-      Comment comment = new Comment(id, name, text, timestamp);
+      Comment comment = new Comment(id, email, name, text, timestamp);
       comments.add(comment);
       numComments++;
     }
@@ -73,11 +76,16 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // only logged-in users can comment
+    UserService userService = UserServiceFactory.getUserService();
+
+    String email = userService.getCurrentUser().getEmail();
     String name = request.getParameter("name");
     String text = request.getParameter("text");
     long timestamp = System.currentTimeMillis();
 
     Entity commentEntity = new Entity("Comment");
+    commentEntity.setProperty("email", email);
     commentEntity.setProperty("name", name);
     commentEntity.setProperty("text", text);
     commentEntity.setProperty("timestamp", timestamp);
