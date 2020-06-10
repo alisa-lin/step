@@ -77,12 +77,12 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // only logged-in users with nicknames can comment
-    UserService userService = UserServiceFactory.getUserService();
+    User currentUser = UserServiceFactory.getUserService().getCurrentUser();
 
-    String email = userService.getCurrentUser().getEmail();
+    String email = currentUser.getEmail();
     String text = request.getParameter("text");
     long timestamp = System.currentTimeMillis();
-    String nickname = getUserNickname(userService.getCurrentUser().getUserId());
+    String nickname = getUserNickname(currentUser.getUserId());
 
     Entity commentEntity = new Entity("Comment");
     commentEntity.setProperty("email", email);
