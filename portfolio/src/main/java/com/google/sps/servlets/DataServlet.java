@@ -17,11 +17,12 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
-// import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.sps.data.Comment;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -57,11 +58,12 @@ public class DataServlet extends HttpServlet {
         break;
       }
       long id = entity.getKey().getId();
-      String name = (String) entity.getProperty("name");
+      String email = (String) entity.getProperty("email");
       String text = (String) entity.getProperty("text");
       long timestamp = (long) entity.getProperty("timestamp");
+      String nickname = (String) entity.getProperty("nickname");
 
-      Comment comment = new Comment(id, name, text, timestamp);
+      Comment comment = new Comment(id, email, text, nickname, timestamp);
       comments.add(comment);
       numComments++;
     }
@@ -74,14 +76,19 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String name = request.getParameter("name");
+    // only logged-in users with nicknames can comment
+    User currentUser = UserServiceFactory.getUserService().getCurrentUser();
+
+    String email = currentUser.getEmail();
     String text = request.getParameter("text");
     long timestamp = System.currentTimeMillis();
+    String nickname = getUserNickname(currentUser.getUserId());
 
     Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("name", name);
+    commentEntity.setProperty("email", email);
     commentEntity.setProperty("text", text);
     commentEntity.setProperty("timestamp", timestamp);
+    commentEntity.setProperty("nickname", nickname);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
@@ -102,4 +109,20 @@ public class DataServlet extends HttpServlet {
 
     return maxComments;
   }
+
+  /** Returns the nickname of the user with id, or null if the user has not set a nickname. */
+  private String getUserNickname(String id) {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query =
+        new Query("UserInfo")
+            .setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+    PreparedQuery results = datastore.prepare(query);
+    Entity entity = results.asSingleEntity();
+    if (entity == null) {
+      return null;
+    }
+    String nickname = (String) entity.getProperty("nickname");
+    return nickname;
+  }
 }
+

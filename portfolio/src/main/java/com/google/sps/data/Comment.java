@@ -16,24 +16,18 @@ package com.google.sps.data;
 
 /** Class containing comment information. */
 public final class Comment {
-
+  
   private final long id;
-  private final String name;
+  private final String email;
   private final String text;
+  private final String nickname;
   private final long timestamp;
 
-  public Comment(long id, String name, String text, long timestamp) {
+  public Comment(long id, String email, String text, String nickname, long timestamp) {
     this.id = id;
-    this.name = name;
+    this.email = email;
     this.text = text;
+    this.nickname = nickname;
     this.timestamp = timestamp;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getText() {
-    return text;
   }
 }

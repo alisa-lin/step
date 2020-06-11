@@ -12,6 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/** onload function that displays comments and comment form/login information */
+function displayCommentSection() {
+    fetch('/login').then(response => response.json()).then(info => {
+        if (info.loggedIn && !info.nickname) {
+            window.location.replace("/nickname");
+        }
+        handleCommentForm(info.loggedIn, info.redirectUrl);
+        getComments();
+    });
+}
+
+/** Given the login status, this function displays the comment form or the log in button */
+function handleCommentForm(loggedIn, redirectUrl) {
+    var login = document.getElementById('login');
+    if (!loggedIn) {
+        document.getElementById('comments-form').style.display = "none";
+        login.innerHTML = "Log in"
+        login.href = redirectUrl;
+    } else {
+        document.getElementById('comments-form').style.display = "block";
+        login.innerHTML = "Log out"
+        login.href = redirectUrl;
+    }
+}
+
 /** Fetches existing comments and updates UI. */
 function getComments() {
     document.getElementById('comments').innerHTML = "";
@@ -29,7 +54,7 @@ function createComment(comment) {
   commentElement.className = 'comment';
 
   const titleElement = document.createElement('span');
-  titleElement.innerText = comment.name + ": " + comment.text;
+  titleElement.innerText = comment.nickname + ": " + comment.text;
 
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
