@@ -17,7 +17,6 @@ google.charts.setOnLoadCallback(drawChart);
 
 /** Creates a chart and adds it to the page. */
 function drawChart() {
-    console.log("drawing chart");
     var data = google.visualization.arrayToDataTable([
         ['App', 'Hours per Week'],
         ['Instagram',     6],
