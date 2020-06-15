@@ -112,14 +112,11 @@ p {
     margin: 10px 0px 0px 0px;
     text-align: justify;
     text-justify: inter-word;
+    text-align-last: left;
 }
 
 form {
     margin-bottom: 20px;
-}
-
-input[type=text] {
-    width: 640px;
 }
 
 textarea {
