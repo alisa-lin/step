@@ -12,6 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+/** Creates a chart and adds it to the page. */
+function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+        ['App', 'Hours per Week'],
+        ['Instagram',     6],
+        ['Facebook',      4.8],
+        ['Reddit',  4.6],
+        ['Messenger', 3.75],
+        ['Youtube',    3.25]
+    ]);
+
+    var options = {
+        title: 'My Screentime',
+        pieHole: 0.4,
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('chart-container'));
+    chart.draw(data, options);
+
 /** onload function that displays comments and comment form/login information */
 function displayCommentSection() {
     fetch('/login').then(response => response.json()).then(info => {
