@@ -22,43 +22,82 @@ import java.util.stream.Collectors;
 public final class FindMeetingQuery {
 
     public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-        System.err.println("New request!");
-        ArrayList<TimeRange> possibleTimes = new ArrayList<TimeRange>();
+        ArrayList<TimeRange> wholeDay = new ArrayList<TimeRange>();
 
         long requestDuration = request.getDuration();
         // if the duration is longer than the day, there is no possible meeting time
         if (TimeRange.WHOLE_DAY.duration() < requestDuration) {
-            return possibleTimes;
+            return wholeDay;
         }
 
-        possibleTimes.add(TimeRange.WHOLE_DAY);
+        wholeDay.add(TimeRange.WHOLE_DAY);
 
         Collection<String> attendees = request.getAttendees();
+        Collection<String> optionalAttendees = request.getOptionalAttendees();
+        Collection<String> totalAttendees = new ArrayList<String>();
+        for (String attendee : attendees) {
+            totalAttendees.add(attendee);
+        }
+        boolean noOpAtt = optionalAttendees.isEmpty();
+        if (!noOpAtt) {
+            for (String attendee : optionalAttendees) {
+                totalAttendees.add(attendee);
+            }
+        }
+
+        // create a request with optional attendees only
+        MeetingRequest optionalRequest = new MeetingRequest(totalAttendees, requestDuration);
+
         // if there are no attendees in the request, then the whole day is a possible meeting time
         if (attendees.isEmpty()) {
-            return possibleTimes;
+            if (noOpAtt) {
+                return wholeDay;
+            } else {
+                return query(events, optionalRequest);
+            }
         }
 
         // check if there is attendee overlap
-        ArrayList<Event> relevantEvents = new ArrayList<Event>();
+        ArrayList<Event> allRelevantEvents = new ArrayList<Event>();
+        ArrayList<Event> mandatoryRelevantEvents = new ArrayList<Event>();
 
         Collection<String> curAtt;
-        Collection<String> tempCollection;
+        Collection<String> tempCollection1;
+        Collection<String> tempCollection2;
         for (Event cur : events) {
             curAtt = cur.getAttendees();
-            tempCollection = attendees.stream()
+            tempCollection1 = attendees.stream()
                 .filter(curAtt::contains)
                 .collect(Collectors.toList());
-            if (!tempCollection.isEmpty()) {
-                relevantEvents.add(cur);
+            tempCollection2 = totalAttendees.stream()
+                .filter(curAtt::contains)
+                .collect(Collectors.toList());
+
+            if (!tempCollection1.isEmpty()) {
+                mandatoryRelevantEvents.add(cur);
+            }
+            if (!tempCollection2.isEmpty()) {
+                allRelevantEvents.add(cur);
             }
         }
 
         // if none of the existing events have attendee overlap, then the whole day is a possible meeting time
-        if (relevantEvents.isEmpty()) {
-            return possibleTimes;
+        if (allRelevantEvents.isEmpty()) {
+            return wholeDay;
+        } else if (mandatoryRelevantEvents.isEmpty()) {
+            return query(events, optionalRequest);
         }
 
+        ArrayList<TimeRange> possibleTimes = checkOverlap(wholeDay, allRelevantEvents, requestDuration);
+        if (possibleTimes.isEmpty()) {
+            possibleTimes.add(TimeRange.WHOLE_DAY);
+            possibleTimes = checkOverlap(wholeDay, mandatoryRelevantEvents, requestDuration);
+        }
+
+        return possibleTimes;
+    }
+
+    public ArrayList<TimeRange> checkOverlap(ArrayList<TimeRange> possibleTimes, ArrayList<Event> relevantEvents, long requestDuration) {
         // check if there is time overlap
         TimeRange curPT = possibleTimes.get(0);
         TimeRange curRE = relevantEvents.get(0).getWhen();
@@ -81,8 +120,6 @@ public final class FindMeetingQuery {
                         REStart = 0;
                     }
                     TimeRange evTime = relevantEvents.get(j).getWhen();
-                    System.err.println("i is " + i + " and j is " + j);
-                    System.err.println("posTime is " + posTime + " and evTime is " + evTime);
                     if (posTime.overlaps(evTime)) {
                         curPT = posTime;
                         curRE = evTime;
@@ -114,18 +151,15 @@ public final class FindMeetingQuery {
                 }
             }
             if (repEnd) {
-                System.err.println("adding " + TimeRange.fromStartEnd(curRE.end(), curPT.end() - 1, true) + " at index " + PTStart);
                 possibleTimes.add(PTStart, TimeRange.fromStartEnd(curRE.end(), curPT.end() - 1, true));
                 removeIndexIncrement++;
             }
             if (repBeg) {
                 // if both repEnd and repBeg are true, this should displace repEnd by one.
-                System.err.println("adding " + TimeRange.fromStartEnd(curPT.start(), curRE.start(), false) + " at index " + PTStart);
                 possibleTimes.add(PTStart, TimeRange.fromStartEnd(curPT.start(), curRE.start(), false));
                 removeIndexIncrement++;
             }
             if (remove) {
-                System.err.println("removing " + possibleTimes.get(PTStart + removeIndexIncrement) + " at index " + PTStart + removeIndexIncrement);
                 possibleTimes.remove(PTStart + removeIndexIncrement);
                 removeIndexIncrement = 0;
             }
@@ -138,7 +172,6 @@ public final class FindMeetingQuery {
                 remove = false;
                 for (int i = start; i < possibleTimes.size(); i++) {
                     if (possibleTimes.get(i).duration() < requestDuration) {
-                        System.err.println("Oops, " + possibleTimes.get(i) + " has duration " + possibleTimes.get(i).duration() + " and the request has duration " + request.getDuration());
                         remove = true;
                         start = i;
                         break;
@@ -152,9 +185,7 @@ public final class FindMeetingQuery {
                 }
             } while (remove);
         }
-
-        System.err.println("Done!");
-        System.err.println();
+        
         return possibleTimes;
     }
 }
